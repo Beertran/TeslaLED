@@ -43,11 +43,14 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 public class BluetoothClient extends Context {
+
+  private BluetoothDevice device = null;
+
   public BluetoothClient() {
 
   }
 
-  public void main() {
+  public void connect() {
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     if (bluetoothAdapter == null) {
       System.out.println("[-] Bluetooth not supported");
@@ -61,15 +64,20 @@ public class BluetoothClient extends Context {
 
     System.out.println("[+] Bluetooth enabled");
 
-    BluetoothDevice device = bluetoothAdapter.getRemoteDevice("B8:27:EB:A5:89:A8");
+    this.device = bluetoothAdapter.getRemoteDevice("B8:27:EB:A5:89:A8");
     System.out.println("[+] Device found");
+  }
+
+  public void main() {
+
+    this.connect();
 
     BluetoothSocket socket = null;
     try {
       if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
         return;
       }
-      socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+      socket = this.device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
       socket.connect();
       System.out.println("[+] Socket connected");
     } catch (IOException e) {
@@ -80,12 +88,12 @@ public class BluetoothClient extends Context {
     
     while (true) {
       try {
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         OutputStream outputStream = socket.getOutputStream();
         outputStream.write("bonjour".getBytes());
         outputStream.flush();
         System.out.println("[+] Message sent");
-        Thread.sleep(2000);
+        Thread.sleep(4000);
       } catch (IOException | InterruptedException e) {
         System.out.println("[-] Message sending failed");
         e.printStackTrace();

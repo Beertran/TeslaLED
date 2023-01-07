@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">TeslaLED</string>
+    <string name="hello_button_label">Bonjour</string>
+    <string name="sorry_button_label">Desole</string>
+    <string name="thanks_button_label">Merci</string>
+    <string name="tesla_button_label">Tesla</string>
+    <string name="square_button_label">Carre</string>
+    <string name="clock_button_label">Horloge</string>
+</resources>

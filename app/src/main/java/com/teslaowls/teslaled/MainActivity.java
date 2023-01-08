@@ -48,6 +48,5 @@ public class MainActivity extends AppCompatActivity {
             bluetoothClient.connect();
         }
         bluetoothClient.sendMessage(feature.toLowerCase());
-        System.out.println("[+] Socket closed");
     }
 }

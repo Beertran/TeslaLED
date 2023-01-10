@@ -83,13 +83,19 @@ public class MainActivity extends AppCompatActivity {
         bluetoothClient.findDevice();
         if (!bluetoothClient.isConnected()) {
             bluetoothClient.connect();
-            if (!bluetoothClient.isConnected()) {
-                System.out.println("[-] Failed to connect to the device.");
+        }
+        if (bluetoothClient.isConnected()) {
+            if (bluetoothClient.sendMessage("legacy_command")) {
+                if (bluetoothClient.sendMessage(feature)) {
+                    return true;
+                } else {
+                    System.out.println("[-] Couldn't send legacy command.");
+                    return false;
+                }
+            } else {
+                System.out.println("[-] Couldn't use legacy command.");
                 return false;
             }
-        }
-        if (bluetoothClient.sendMessage(feature)) {
-            return true;
         }
         System.out.println("[-] Failed to send message.");
         return false;

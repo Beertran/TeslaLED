@@ -30,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
         put("Big hello", "hello2");
     }};
 
-
-
     BluetoothClient bluetoothClient = new BluetoothClient();
 
     @Override
@@ -55,27 +53,30 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     boolean isSendCommandSuccess = initiateCommand(featuresToCommands.get(feature));
-                    int temporaryColor;
-                    if (!isSendCommandSuccess) {
-                        temporaryColor = 0xFFFF0000;
-                        Toast.makeText(MainActivity.this, "Unknown error while sending message.", Toast.LENGTH_SHORT).show();
-                        System.out.println("[-] Failed to initiate command.");
-                    } else {
-                        temporaryColor = 0xFF00FF00;
-                    }
-                    final Drawable originalColor = button.getBackground();
-                    button.setBackgroundColor(temporaryColor);
-                    button.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            button.setBackground(originalColor);
-                        }
-                    }, 2000);
-
+                    buttonColorFeedback(button, isSendCommandSuccess);
                 }
             });
             gridLayout.addView(button);
         }
+    }
+
+    private void buttonColorFeedback(Button button, boolean isSendCommandSuccess) {
+        int temporaryColor;
+        if (!isSendCommandSuccess) {
+            temporaryColor = 0xFFFF0000;
+            Toast.makeText(MainActivity.this, "Unknown error while sending message.", Toast.LENGTH_SHORT).show();
+            System.out.println("[-] Failed to initiate command.");
+        } else {
+            temporaryColor = 0xFF00FF00;
+        }
+        final Drawable originalColor = button.getBackground();
+        button.setBackgroundColor(temporaryColor);
+        button.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                button.setBackground(originalColor);
+            }
+        }, 2000);
     }
 
     private boolean initiateCommand(String feature) {

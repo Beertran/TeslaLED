@@ -1,19 +1,36 @@
 package com.teslaowls.teslaled;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.Toast;
 
 import androidx.annotation.MainThread;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
-    List<String> features = Arrays.asList("Bonjour", "Merci", "Carre", "Tesla", "Distance", "Desole");
+    // A dictionary with the features and their corresponding commands, in this order
+    private static final Map<String, String> featuresToCommands = new LinkedHashMap<String, String>() {{
+        put("Bonjour", "bonjour");
+        put("Merci", "merci");
+        put("Carre", "carre");
+        put("Tesla", "tesla");
+        put("Distance", "distance");
+        put("Desole", "desole");
+        put("Hello", "hello");
+        put("Big hello", "hello2");
+    }};
+
+
 
     BluetoothClient bluetoothClient = new BluetoothClient();
 
@@ -23,30 +40,57 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         GridLayout gridLayout = findViewById(R.id.command_grid);
-        for (final String feature : features) {
+        for (final String feature : featuresToCommands.keySet()) {
             Button button = new Button(this);
             // make the button fill the cell
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.height = 250;
-            params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 0.5f);
+            params.height = 300;
+            params.width = 0;
+            params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
             params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
             button.setLayoutParams(params);
             button.setText(feature);
+            button.setTextSize(28);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    sendCommand(feature);
+                    boolean isSendCommandSuccess = initiateCommand(featuresToCommands.get(feature));
+                    int temporaryColor;
+                    if (!isSendCommandSuccess) {
+                        temporaryColor = 0xFFFF0000;
+                        Toast.makeText(MainActivity.this, "Unknown error while sending message.", Toast.LENGTH_SHORT).show();
+                        System.out.println("[-] Failed to initiate command.");
+                    } else {
+                        temporaryColor = 0xFF00FF00;
+                    }
+                    final Drawable originalColor = button.getBackground();
+                    button.setBackgroundColor(temporaryColor);
+                    button.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            button.setBackground(originalColor);
+                        }
+                    }, 2000);
+
                 }
             });
             gridLayout.addView(button);
         }
     }
 
-    private void sendCommand(String feature) {
+    private boolean initiateCommand(String feature) {
         bluetoothClient.findDevice();
         if (!bluetoothClient.isConnected()) {
             bluetoothClient.connect();
+            if (!bluetoothClient.isConnected()) {
+                System.out.println("[-] Failed to connect to the device.");
+                return false;
+            }
         }
-        bluetoothClient.sendMessage(feature.toLowerCase());
+        if (bluetoothClient.sendMessage(feature)) {
+            return true;
+        }
+        System.out.println("[-] Failed to send message.");
+        return false;
     }
 }

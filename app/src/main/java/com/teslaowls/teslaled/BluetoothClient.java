@@ -69,12 +69,24 @@ public class BluetoothClient extends Context {
         System.out.println("[+] Device found");
     }
 
-    public void connect() {
+    public void createSocket() {
         try {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             this.socket = this.device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+        } catch (IOException e) {
+            System.out.println("[-] Couldn't create socket.");
+            e.printStackTrace();
+        }
+    }
+
+    public void connect() {
+        try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            this.createSocket();
             this.socket.connect();
             System.out.println("[+] Socket connected");
         } catch (IOException e) {
@@ -94,7 +106,7 @@ public class BluetoothClient extends Context {
         System.out.println("[+] Socket closed");
     }
 
-    public void sendMessage(String message) {
+    public boolean sendMessage(String message) {
         try {
             OutputStream outputStream = this.socket.getOutputStream();
             outputStream.write(message.getBytes());
@@ -107,19 +119,21 @@ public class BluetoothClient extends Context {
             if (read > 0) {
                 String response = new String(buffer, 0, read);
                 System.out.println("[+] Received: " + response);
+                return true;
             }
         } catch (IOException e) {
             System.out.println("[-] Message sending failed");
             e.printStackTrace();
+            return false;
         }
+        return false;
     }
 
     public boolean isConnected() {
         if (this.socket != null) {
             return this.socket.isConnected();
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

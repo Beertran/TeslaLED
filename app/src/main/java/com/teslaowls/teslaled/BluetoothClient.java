@@ -106,12 +106,12 @@ public class BluetoothClient extends Context {
         System.out.println("[+] Socket closed");
     }
 
-    public boolean sendMessage(String message) {
+    public boolean sendMessage(byte[] message) {
         try {
             OutputStream outputStream = this.socket.getOutputStream();
-            outputStream.write(message.getBytes());
+            outputStream.write(message);
             outputStream.flush();
-            System.out.println("[+] Message sent: " + message);
+            System.out.println("[+] Message sent");
 
             InputStream inputStream = this.socket.getInputStream();
             byte[] buffer = new byte[1024];

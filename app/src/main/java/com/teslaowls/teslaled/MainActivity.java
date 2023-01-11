@@ -19,15 +19,15 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     // A dictionary with the features and their corresponding commands, in this order
-    private static final Map<String, String> featuresToCommands = new LinkedHashMap<String, String>() {{
-        put("Bonjour", "bonjour");
-        put("Merci", "merci");
-        put("Carre", "carre");
-        put("Tesla", "tesla");
-        put("Distance", "distance");
-        put("Desole", "desole");
-        put("Hello", "hello");
-        put("Big hello", "hello2");
+    private static final Map<String, PanelCommand> featuresToCommands = new LinkedHashMap<String, PanelCommand>() {{
+        put("Bonjour", new LegacyCommand("bonjour"));
+        put("Merci", new LegacyCommand("merci"));
+        put("Carre", new LegacyCommand("carre"));
+        put("Tesla", new LegacyCommand("tesla"));
+        put("Distance", new LegacyCommand("distance"));
+        put("Desole", new LegacyCommand("desole"));
+        put("Hello", new LegacyCommand("hello"));
+        put("Merci (new)", new ImageCommand("merci.ppm"));
     }};
 
     BluetoothClient bluetoothClient = new BluetoothClient();
@@ -79,22 +79,14 @@ public class MainActivity extends AppCompatActivity {
         }, 2000);
     }
 
-    private boolean initiateCommand(String feature) {
+    private boolean initiateCommand(PanelCommand command) {
         bluetoothClient.findDevice();
         if (!bluetoothClient.isConnected()) {
             bluetoothClient.connect();
         }
         if (bluetoothClient.isConnected()) {
-            if (bluetoothClient.sendMessage("legacy_command")) {
-                if (bluetoothClient.sendMessage(feature)) {
-                    return true;
-                } else {
-                    System.out.println("[-] Couldn't send legacy command.");
-                    return false;
-                }
-            } else {
-                System.out.println("[-] Couldn't use legacy command.");
-                return false;
+            if (command.sendCommand(bluetoothClient, this.getAssets())) {
+                return true;
             }
         }
         System.out.println("[-] Failed to send message.");

@@ -7,27 +7,23 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.Toast;
 
-import androidx.annotation.MainThread;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
     // A dictionary with the features and their corresponding commands, in this order
     private static final Map<String, PanelCommand> featuresToCommands = new LinkedHashMap<String, PanelCommand>() {{
-        put("Bonjour", new LegacyCommand("bonjour"));
-        put("Merci", new LegacyCommand("merci"));
-        put("Carre", new LegacyCommand("carre"));
-        put("Tesla", new LegacyCommand("tesla"));
-        put("Distance", new LegacyCommand("distance"));
-        put("Desole", new LegacyCommand("desole"));
-        put("Hello", new LegacyCommand("hello"));
-        put("Merci (new)", new ImageCommand("merci.ppm"));
+        put("Bonjour", new LegacyCommand("bonjour", 3000));
+        put("Merci", new LegacyCommand("merci", 3000));
+        put("Carre", new LegacyCommand("carre", 5000));
+        put("Tesla", new LegacyCommand("tesla", 5000));
+        put("Distance", new LegacyCommand("distance", 6000));
+        put("Desole", new LegacyCommand("desole", 3000));
+        put("Hello", new LegacyCommand("hello", 3000));
+        put("Merci (1s)", new ImageCommand("merci.ppm", 1000));
     }};
 
     BluetoothClient bluetoothClient = new BluetoothClient();
@@ -52,15 +48,21 @@ public class MainActivity extends AppCompatActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    boolean isSendCommandSuccess = initiateCommand(featuresToCommands.get(feature));
-                    buttonColorFeedback(button, isSendCommandSuccess);
+                    PanelCommand currentCommand = featuresToCommands.get(feature);
+                    if (currentCommand != null) {
+                        boolean isSendCommandSuccess = initiateCommand(currentCommand);
+                        buttonColorFeedback(button, isSendCommandSuccess, currentCommand);
+                    } else {
+                        System.out.println("[-] Current command not found.");
+                        buttonColorFeedback(button, false, currentCommand);
+                    }
                 }
             });
             gridLayout.addView(button);
         }
     }
 
-    private void buttonColorFeedback(Button button, boolean isSendCommandSuccess) {
+    private void buttonColorFeedback(Button button, boolean isSendCommandSuccess, PanelCommand currentCommand) {
         int temporaryColor;
         if (!isSendCommandSuccess) {
             temporaryColor = 0xFFFF0000;
@@ -70,13 +72,17 @@ public class MainActivity extends AppCompatActivity {
             temporaryColor = 0xFF00FF00;
         }
         final Drawable originalColor = button.getBackground();
+        int sleepDurationMs = (currentCommand == null ? 2000 : currentCommand.getSleepDurationMs());
         button.setBackgroundColor(temporaryColor);
         button.postDelayed(new Runnable() {
             @Override
             public void run() {
                 button.setBackground(originalColor);
+                if (currentCommand != null) {
+                    currentCommand.kill(bluetoothClient);
+                }
             }
-        }, 3000);
+        }, sleepDurationMs);
     }
 
     private boolean initiateCommand(PanelCommand command) {
@@ -85,9 +91,7 @@ public class MainActivity extends AppCompatActivity {
             bluetoothClient.connect();
         }
         if (bluetoothClient.isConnected()) {
-            if (command.sendCommand(bluetoothClient, this.getAssets())) {
-                return true;
-            }
+            return command.sendCommand(bluetoothClient, this.getAssets());
         }
         System.out.println("[-] Failed to send message.");
         return false;

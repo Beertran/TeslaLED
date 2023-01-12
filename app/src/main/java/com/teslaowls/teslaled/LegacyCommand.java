@@ -6,8 +6,8 @@ public class LegacyCommand extends PanelCommand {
 
     private String scriptName;
 
-    public LegacyCommand(String scriptName) {
-        super();
+    public LegacyCommand(String scriptName, int sleepDurationMs) {
+        super(sleepDurationMs);
 
         this.scriptName = scriptName;
     }
@@ -20,6 +20,7 @@ public class LegacyCommand extends PanelCommand {
         this.scriptName = scriptName;
     }
 
+    @Override
     public boolean sendCommand(BluetoothClient bluetoothClient, AssetManager assetManager) {
         if (bluetoothClient.sendMessage("legacy_command".getBytes())) {
             System.out.println("[+] Able to send legacy command.");

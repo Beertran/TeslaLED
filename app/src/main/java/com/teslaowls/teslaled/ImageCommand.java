@@ -4,16 +4,15 @@ import android.content.res.AssetManager;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 public class ImageCommand extends PanelCommand {
 
     private String imageFile;
 
-    public ImageCommand(String imageName) {
-        super();
+    public ImageCommand(String imageFile, int sleepDurationMs) {
+        super(sleepDurationMs);
 
-        this.imageFile = imageName;
+        this.imageFile = imageFile;
     }
 
     public String getImageName() {
@@ -24,6 +23,7 @@ public class ImageCommand extends PanelCommand {
         this.imageFile = imageName;
     }
 
+    @Override
     public boolean sendCommand(BluetoothClient bluetoothClient, AssetManager assetManager) {
         if (bluetoothClient.sendMessage("image_command".getBytes())) {
             System.out.println("[+] Able to send image command.");

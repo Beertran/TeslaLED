@@ -40,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class BluetoothClient extends Context {
@@ -109,23 +110,27 @@ public class BluetoothClient extends Context {
     public boolean sendMessage(byte[] message) {
         try {
             OutputStream outputStream = this.socket.getOutputStream();
-            outputStream.write(message);
+            int chunkSize = 980;
+            for (int i = 0; i < message.length; i += chunkSize) {
+                byte[] chunk = Arrays.copyOfRange(message, i, Math.min(i + chunkSize, message.length));
+                outputStream.write(chunk);
+                outputStream.flush();
+
+                InputStream inputStream = this.socket.getInputStream();
+                byte[] buffer = new byte[1024];
+                int read = inputStream.read(buffer);
+                String response = new String(buffer, 0, read);
+            }
+            byte[] chunk = "DONE".getBytes();
+            outputStream = this.socket.getOutputStream();
+            outputStream.write(chunk);
             outputStream.flush();
-            System.out.println("[+] Sent.");
 
             InputStream inputStream = this.socket.getInputStream();
             byte[] buffer = new byte[1024];
             int read = inputStream.read(buffer);
             String response = new String(buffer, 0, read);
-            System.out.println("[+] Received: " + response);
 
-            outputStream.write("DONE".getBytes());
-            outputStream.flush();
-            System.out.println("[+] DONE sent.");
-
-            read = inputStream.read(buffer);
-            response = new String(buffer, 0, read);
-            System.out.println("[+] Received: " + response);
             return true;
         } catch (IOException e) {
             System.out.println("[-] Message sending failed");

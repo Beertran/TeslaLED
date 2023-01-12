@@ -31,7 +31,7 @@ public class ImageCommand extends PanelCommand {
                 InputStream inputStream = assetManager.open(this.imageFile);
                 int size = inputStream.available();
                 byte[] buffer = new byte[size];
-                inputStream.read(buffer);
+                int lengthRead = inputStream.read(buffer);
 
                 bluetoothClient.sendMessage(buffer);
                 inputStream.close();

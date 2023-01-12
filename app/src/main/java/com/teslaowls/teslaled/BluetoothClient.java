@@ -116,17 +116,14 @@ public class BluetoothClient extends Context {
             InputStream inputStream = this.socket.getInputStream();
             byte[] buffer = new byte[1024];
             int read = inputStream.read(buffer);
-            if (read > 0) {
-                String response = new String(buffer, 0, read);
-                System.out.println("[+] Received: " + response);
-                return true;
-            }
+            String response = new String(buffer, 0, read);
+            System.out.println("[+] Received: " + response);
+            return true;
         } catch (IOException e) {
             System.out.println("[-] Message sending failed");
             e.printStackTrace();
             return false;
         }
-        return false;
     }
 
     public boolean isConnected() {

@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 button.setBackground(originalColor);
             }
-        }, 2000);
+        }, 3000);
     }
 
     private boolean initiateCommand(PanelCommand command) {

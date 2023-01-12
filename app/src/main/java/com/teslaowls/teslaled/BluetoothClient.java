@@ -111,12 +111,20 @@ public class BluetoothClient extends Context {
             OutputStream outputStream = this.socket.getOutputStream();
             outputStream.write(message);
             outputStream.flush();
-            System.out.println("[+] Message sent");
+            System.out.println("[+] Sent.");
 
             InputStream inputStream = this.socket.getInputStream();
             byte[] buffer = new byte[1024];
             int read = inputStream.read(buffer);
             String response = new String(buffer, 0, read);
+            System.out.println("[+] Received: " + response);
+
+            outputStream.write("DONE".getBytes());
+            outputStream.flush();
+            System.out.println("[+] DONE sent.");
+
+            read = inputStream.read(buffer);
+            response = new String(buffer, 0, read);
             System.out.println("[+] Received: " + response);
             return true;
         } catch (IOException e) {

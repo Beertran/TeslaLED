@@ -16,14 +16,16 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     // A dictionary with the features and their corresponding commands, in this order
     private static final Map<String, PanelCommand> featuresToCommands = new LinkedHashMap<String, PanelCommand>() {{
-        put("Bonjour", new LegacyCommand("bonjour", 3000));
-        put("Merci", new LegacyCommand("merci", 3000));
+        put("Bonjour \uD83D\uDE03", new ImageCommand("bonjour.ppm", 3000));
+        put("Hello \uD83D\uDE03", new ImageCommand("hello.ppm", 3000));
+        put("Merci", new ImageCommand("merci.ppm", 3000));
+        put("Desole", new ImageCommand("desole.ppm", 3000));
+        put("Feu de croisement", new ImageCommand("feu-croisement.ppm", 4000));
+        put("Clignotants", new ImageCommand("clignotants.ppm", 4000));
+        put("Tesla", new ImageCommand("tesla.ppm", 2000));
+        put("Tesla ❤️", new LegacyCommand("tesla", 5000));
+        put("Distance", new ImageCommand("distance.ppm", 6000));
         put("Carre", new LegacyCommand("carre", 5000));
-        put("Tesla", new LegacyCommand("tesla", 5000));
-        put("Distance", new LegacyCommand("distance", 6000));
-        put("Desole", new LegacyCommand("desole", 3000));
-        put("Hello", new LegacyCommand("hello", 3000));
-        put("Merci (1s)", new ImageCommand("merci.ppm", 1000));
     }};
 
     BluetoothClient bluetoothClient = new BluetoothClient();
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
             button.setLayoutParams(params);
             button.setText(feature);
-            button.setTextSize(28);
+            button.setTextSize(26);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

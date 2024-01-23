@@ -3,6 +3,7 @@ package com.teslaowls.teslaled;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.Toast;
@@ -16,16 +17,19 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     // A dictionary with the features and their corresponding commands, in this order
     private static final Map<String, PanelCommand> featuresToCommands = new LinkedHashMap<String, PanelCommand>() {{
-        put("Bonjour \uD83D\uDE03", new ImageCommand("bonjour.ppm", 3000));
-        put("Hello \uD83D\uDE03", new ImageCommand("hello.ppm", 3000));
+        put("Bonjour", new ImageCommand("bonjour.ppm", 3000));
+        put("Hello", new ImageCommand("hello.ppm", 3000));
         put("Merci", new ImageCommand("merci.ppm", 3000));
+        put("Thanks", new ImageCommand("thanks.ppm", 3000));
         put("Desole", new ImageCommand("desole.ppm", 3000));
-        put("Feu de croisement", new ImageCommand("feu-croisement.ppm", 4000));
-        put("Clignotants", new ImageCommand("clignotants.ppm", 4000));
+        put("Sorry", new ImageCommand("sorry.ppm", 3000));
         put("Tesla", new ImageCommand("tesla.ppm", 2000));
         put("Tesla ❤️", new LegacyCommand("tesla", 5000));
+        put("Feux de croisement", new ImageCommand("feu-croisement.ppm", 4000));
+        put("Clignotants", new ImageCommand("clignotants.ppm", 4000));
         put("Distance", new ImageCommand("distance.ppm", 6000));
-        put("Carre", new LegacyCommand("carre", 5000));
+        put("❤️", new ImageCommand("red_heart.ppm", 2000));
+        //put("Carre", new LegacyCommand("carre", 5000));
     }};
 
     BluetoothClient bluetoothClient = new BluetoothClient();
@@ -34,13 +38,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         GridLayout gridLayout = findViewById(R.id.command_grid);
         for (final String feature : featuresToCommands.keySet()) {
             Button button = new Button(this);
             // make the button fill the cell
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.height = 300;
+            params.height = 250;
             params.width = 0;
             params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
             params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
